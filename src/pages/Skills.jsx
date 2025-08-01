@@ -1,20 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Code, Network, ChevronRight, Star, Award } from 'lucide-react';
+import { Shield, Code, Network, ChevronRight, Star, Award, Brain } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import useSkills from '../hooks/useSkills';
 import useTechnologies from '../hooks/useTechnologies';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Skills = () => {
-  const { skills, loading: skillsLoading } = useSkills();
+  const { t, td } = useLanguage();
+  const { skills, skillCategories, loading: skillsLoading } = useSkills();
   const { technologies, loading: techLoading } = useTechnologies();
-  const [activeSkillTab, setActiveSkillTab] = useState('cybersecurity');
+  const [activeSkillTab, setActiveSkillTab] = useState('');
 
-  if (skillsLoading || techLoading) {
-    return <LoadingSpinner />;
+  // Icon mapping
+  const iconMap = {
+    Shield: Shield,
+    Code: Code,
+    Network: Network,
+    Brain: Brain
+  };
+
+  // Color mapping
+  const colorMap = {
+    cybersecurity: 'from-red-500 to-orange-500',
+    python: 'from-blue-500 to-cyan-500',
+    network: 'from-green-500 to-emerald-500',
+    ai: 'from-purple-500 to-pink-500'
+  };
+
+  // Build dynamic skill categories from API data
+  const dynamicSkillCategories = {};
+  if (skillCategories && skillCategories.length > 0) {
+    skillCategories.forEach(category => {
+      const IconComponent = iconMap[category.icon] || Code;
+      dynamicSkillCategories[category.category_key] = {
+        ...category,
+        icon: IconComponent,
+        color: colorMap[category.category_key] || 'from-gray-500 to-gray-600'
+      };
+    });
   }
 
-  const skillCategories = {
+  const skillCategoriesToUse = Object.keys(dynamicSkillCategories).length > 0 ? dynamicSkillCategories : {
     cybersecurity: {
       ...skills.cybersecurity,
       icon: Shield,
@@ -32,10 +59,21 @@ const Skills = () => {
     }
   };
 
+  // Set initial active tab - MOVED OUTSIDE OF CONDITIONAL
+  useEffect(() => {
+    if (!activeSkillTab && Object.keys(skillCategoriesToUse).length > 0) {
+      setActiveSkillTab(Object.keys(skillCategoriesToUse)[0]);
+    }
+  }, [skillCategoriesToUse, activeSkillTab]);
+
+  if (skillsLoading || techLoading) {
+    return <LoadingSpinner />;
+  }
+
   const SkillBar = ({ skill, index }) => (
     <div className="space-y-2" style={{ animationDelay: `${index * 0.1}s` }}>
       <div className="flex justify-between items-center">
-        <span className="text-white font-medium">{skill.name}</span>
+        <span className="text-white font-medium">{td(skill.name)}</span>
         <span className="text-green-400 font-bold">{skill.level}%</span>
       </div>
       <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
@@ -54,10 +92,10 @@ const Skills = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Mes <span className="text-green-400">compétences</span>
+              {t('mySkills')}
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              Expertise technique en cybersécurité, développement Python et infrastructure réseau
+              {t('technicalExpertiseSubtitle')}
             </p>
           </div>
         </div>
@@ -68,7 +106,7 @@ const Skills = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-wrap justify-center gap-4 mb-12">
-              {Object.entries(skillCategories).map(([key, category]) => (
+              {Object.entries(skillCategoriesToUse).map(([key, category]) => (
                 <button
                   key={key}
                   onClick={() => setActiveSkillTab(key)}
@@ -79,7 +117,7 @@ const Skills = () => {
                   }`}
                 >
                   <category.icon size={20} />
-                  {category.title}
+                  {td(category.title)}
                 </button>
               ))}
             </div>
@@ -91,15 +129,15 @@ const Skills = () => {
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-cyan-400 rounded-lg flex items-center justify-center">
-                      {React.createElement(skillCategories[activeSkillTab].icon, { size: 24, className: "text-gray-900" })}
+                      {React.createElement(skillCategoriesToUse[activeSkillTab]?.icon || Code, { size: 24, className: "text-gray-900" })}
                     </div>
                     <h3 className="text-2xl font-bold text-white">
-                      {skillCategories[activeSkillTab].title}
+                      {td(skillCategoriesToUse[activeSkillTab]?.title || 'Compétences')}
                     </h3>
                   </div>
                   
                   <div className="space-y-6">
-                    {skillCategories[activeSkillTab].items.map((skill, index) => (
+                    {(skillCategoriesToUse[activeSkillTab]?.items || []).map((skill, index) => (
                       <SkillBar key={index} skill={skill} index={index} />
                     ))}
                   </div>
@@ -110,7 +148,7 @@ const Skills = () => {
               <div className="space-y-6">
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                   <h3 className="text-2xl font-bold text-white mb-6">
-                    Technologies & Outils
+                    {t('technologiesTools')}
                   </h3>
                   
                   <div className="grid grid-cols-2 gap-4">
@@ -125,8 +163,8 @@ const Skills = () => {
                           </span>
                         </div>
                         <div>
-                          <div className="text-white font-medium text-sm">{tech.name}</div>
-                          <div className="text-gray-400 text-xs">{tech.category}</div>
+                          <div className="text-white font-medium text-sm">{td(tech.name)}</div>
+                          <div className="text-gray-400 text-xs">{td(tech.category)}</div>
                         </div>
                       </div>
                     ))}
@@ -136,25 +174,25 @@ const Skills = () => {
                 {/* Certifications & Formation */}
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                   <h3 className="text-2xl font-bold text-white mb-6">
-                    Formation continue
+                    {t('continuousTraining')}
                   </h3>
                   
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg">
                       <ChevronRight size={16} className="text-green-400" />
-                      <span className="text-gray-300">Veille technologique quotidienne</span>
+                      <span className="text-gray-300">{t('dailyTechWatch')}</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg">
                       <ChevronRight size={16} className="text-green-400" />
-                      <span className="text-gray-300">Participation à des CTF (Capture The Flag)</span>
+                      <span className="text-gray-300">{t('ctfParticipation')}</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg">
                       <ChevronRight size={16} className="text-green-400" />
-                      <span className="text-gray-300">Formations en ligne spécialisées</span>
+                      <span className="text-gray-300">{t('onlineTraining')}</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg">
                       <ChevronRight size={16} className="text-green-400" />
-                      <span className="text-gray-300">Contribution à des projets open source</span>
+                      <span className="text-gray-300">{t('openSourceContrib')}</span>
                     </div>
                   </div>
                 </div>
@@ -169,7 +207,7 @@ const Skills = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-white text-center mb-12">
-              Points <span className="text-green-400">forts</span>
+              {t('strengthsTitle')}
             </h2>
             
             <div className="grid md:grid-cols-3 gap-8">
@@ -177,10 +215,9 @@ const Skills = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Shield size={32} className="text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Sécurité Proactive</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">{t('proactiveSecurity')}</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Approche préventive de la sécurité avec mise en place de systèmes de détection 
-                  et de protection contre les menaces émergentes.
+                  {t('proactiveSecurityDesc')}
                 </p>
               </div>
 
@@ -188,10 +225,9 @@ const Skills = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Code size={32} className="text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Code Sécurisé</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">{t('secureCode')}</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Développement d'applications Python avec les meilleures pratiques de sécurité 
-                  et respect des standards industriels.
+                  {t('secureCodeDesc')}
                 </p>
               </div>
 
@@ -199,10 +235,9 @@ const Skills = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Award size={32} className="text-gray-900" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Excellence Technique</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">{t('technicalExcellence')}</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  Engagement vers l'excellence avec une formation continue et une veille 
-                  technologique constante dans le domaine de la cybersécurité.
+                  {t('technicalExcellenceDesc')}
                 </p>
               </div>
             </div>
@@ -216,25 +251,24 @@ const Skills = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
               <h3 className="text-3xl font-bold text-white mb-4">
-                Mes compétences vous intéressent ?
+                {t('skillsInterest')}
               </h3>
               <p className="text-gray-300 mb-6 leading-relaxed">
-                Découvrez comment je peux mettre mon expertise au service de vos projets 
-                en cybersécurité et développement Python.
+                {t('skillsInterestDesc')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/projects"
                   className="bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 transform hover:scale-105 inline-flex items-center justify-center gap-2"
                 >
-                  Voir mes projets
+                  {t('viewMyProjects')}
                   <ChevronRight size={20} />
                 </Link>
                 <Link
                   to="/services"
                   className="border-2 border-green-400 text-green-400 px-8 py-4 rounded-lg font-semibold hover:bg-green-400 hover:text-gray-900 transition-all duration-200 transform hover:scale-105 inline-flex items-center justify-center gap-2"
                 >
-                  Mes services
+                  {t('myServices')}
                 </Link>
               </div>
             </div>

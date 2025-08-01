@@ -4,18 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
 import { Badge } from '../../components/ui/badge';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { 
   Plus, Edit, Trash2, Save, X, ArrowLeft, 
-  MessageSquare, Star, Building, User
+  MessageSquare, Star, Building, User, Check, Clock
 } from 'lucide-react';
 
 const AdminTestimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
+  const [pendingTestimonials, setPendingTestimonials] = useState([]);
   const [editingTestimonial, setEditingTestimonial] = useState(null);
   const [newTestimonial, setNewTestimonial] = useState(false);
+  const [showPending, setShowPending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -33,6 +34,7 @@ const AdminTestimonials = () => {
 
   useEffect(() => {
     fetchTestimonials();
+    fetchPendingTestimonials();
   }, []);
 
   const getAuthHeaders = () => {
@@ -69,6 +71,26 @@ const AdminTestimonials = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingTestimonials = async () => {
+    try {
+      const headers = getAuthHeaders();
+      if (!headers) return;
+
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/testimonials/pending`, {
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement des témoignages en attente');
+      }
+
+      const data = await response.json();
+      setPendingTestimonials(data);
+    } catch (err) {
+      console.error('Erreur lors du chargement des témoignages en attente:', err);
     }
   };
 
@@ -138,6 +160,55 @@ const AdminTestimonials = () => {
     }
   };
 
+  const handleApproveTestimonial = async (testimonialId) => {
+    try {
+      const headers = getAuthHeaders();
+      if (!headers) return;
+
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/testimonials/pending/${testimonialId}/approve`, {
+        method: 'PUT',
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'approbation');
+      }
+
+      await fetchTestimonials();
+      await fetchPendingTestimonials();
+      setSuccess('Témoignage approuvé et publié');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleRejectTestimonial = async (testimonialId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir rejeter ce témoignage ?')) {
+      return;
+    }
+
+    try {
+      const headers = getAuthHeaders();
+      if (!headers) return;
+
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/testimonials/pending/${testimonialId}/reject`, {
+        method: 'PUT',
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du rejet');
+      }
+
+      await fetchPendingTestimonials();
+      setSuccess('Témoignage rejeté');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const TestimonialForm = ({ testimonial, onSave, onCancel }) => {
     const [formData, setFormData] = useState(testimonial || initialTestimonialState);
 
@@ -196,12 +267,13 @@ const AdminTestimonials = () => {
 
             <div>
               <Label>Témoignage *</Label>
-              <Textarea
+              <textarea
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 rows={4}
                 required
                 placeholder="Écrivez le témoignage du client..."
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
 
@@ -300,10 +372,19 @@ const AdminTestimonials = () => {
                 </p>
               </div>
             </div>
-            <Button onClick={() => setNewTestimonial(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Nouveau témoignage
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant={showPending ? "default" : "outline"} 
+                onClick={() => setShowPending(!showPending)}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Témoignages en attente ({pendingTestimonials.length})
+              </Button>
+              <Button onClick={() => setNewTestimonial(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Nouveau témoignage
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -330,6 +411,83 @@ const AdminTestimonials = () => {
               setEditingTestimonial(null);
             }}
           />
+        )}
+
+        {/* Témoignages en attente */}
+        {showPending && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Clock className="w-5 h-5 mr-2" />
+                Témoignages en attente d'approbation
+              </CardTitle>
+              <CardDescription>
+                Témoignages soumis par les visiteurs qui nécessitent votre validation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingTestimonials.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">
+                  Aucun témoignage en attente
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {pendingTestimonials.map((pending) => (
+                    <div key={pending.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            {pending.name}
+                          </h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {pending.role} {pending.company && `chez ${pending.company}`}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {pending.email} • Soumis le {new Date(pending.submitted_at).toLocaleDateString('fr-FR')}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {renderStars(pending.rating)}
+                        </div>
+                      </div>
+                      
+                      <blockquote className="text-sm text-gray-600 dark:text-gray-400 italic border-l-4 border-gray-300 pl-4 mb-4">
+                        "{pending.content}"
+                      </blockquote>
+                      
+                      {pending.service_used && (
+                        <div className="mb-4">
+                          <Badge variant="outline" className="text-xs">
+                            Service utilisé: {pending.service_used}
+                          </Badge>
+                        </div>
+                      )}
+                      
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleApproveTestimonial(pending.id)}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Check className="w-4 h-4 mr-1" />
+                          Approuver
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleRejectTestimonial(pending.id)}
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Rejeter
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

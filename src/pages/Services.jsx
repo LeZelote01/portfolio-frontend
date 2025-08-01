@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Code, Server, Users, ArrowRight, Clock, Euro, CheckCircle, Star } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import useServices from '../hooks/useServices';
 import useTestimonials from '../hooks/useTestimonials';
 import useProcessSteps from '../hooks/useProcessSteps';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Services = () => {
+  const { t, td } = useLanguage();
   const { services, loading: servicesLoading } = useServices();
   const { testimonials, loading: testimonialsLoading } = useTestimonials();
   const { processSteps, loading: processLoading } = useProcessSteps();
@@ -32,10 +34,10 @@ const Services = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Mes <span className="text-green-400">services</span>
+              {t('myServicesTitle')}
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              Solutions professionnelles en cybersécurité, développement Python et infrastructure
+              {t('servicesSubtitle')}
             </p>
           </div>
         </div>
@@ -61,7 +63,7 @@ const Services = () => {
                       </div>
                       <div>
                         <h3 className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
-                          {service.title}
+                          {td(service.title)}
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-400 mt-1">
                           <span className="flex items-center gap-1">
@@ -78,16 +80,16 @@ const Services = () => {
 
                     {/* Description */}
                     <p className="text-gray-300 mb-6 leading-relaxed">
-                      {service.description}
+                      {td(service.description)}
                     </p>
 
                     {/* Features */}
                     <div className="space-y-3 mb-8">
-                      <h4 className="text-lg font-semibold text-white">Ce qui est inclus :</h4>
+                      <h4 className="text-lg font-semibold text-white">{t('keyFeatures')} :</h4>
                       {service.features.map((feature, featureIndex) => (
                         <div key={featureIndex} className="flex items-center gap-3">
                           <CheckCircle size={16} className="text-green-400" />
-                          <span className="text-gray-300">{feature}</span>
+                          <span className="text-gray-300">{td(feature)}</span>
                         </div>
                       ))}
                     </div>
@@ -97,7 +99,7 @@ const Services = () => {
                       to="/contact"
                       className="w-full bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
                     >
-                      Demander un devis
+                      {t('requestQuote')}
                       <ArrowRight size={16} />
                     </Link>
                   </div>
@@ -113,7 +115,7 @@ const Services = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-white text-center mb-12">
-              Mon processus de <span className="text-green-400">collaboration</span>
+              {t('collaborationProcess')}
             </h2>
             
             <div className="grid md:grid-cols-5 gap-6">
@@ -123,8 +125,8 @@ const Services = () => {
                     <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-cyan-400 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                       <span className="text-gray-900 font-bold">{step.step}</span>
                     </div>
-                    <h4 className="text-lg font-bold text-white mb-2">{step.title}</h4>
-                    <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                    <h4 className="text-lg font-bold text-white mb-2">{td(step.title)}</h4>
+                    <p className="text-gray-400 text-sm leading-relaxed">{td(step.description)}</p>
                   </div>
                   {index < processSteps.length - 1 && (
                     <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 w-6 h-0.5 bg-green-400/30"></div>
@@ -141,7 +143,7 @@ const Services = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-white text-center mb-12">
-              Ce que disent mes <span className="text-green-400">clients</span>
+              {t('whatClientsSay')}
             </h2>
             
             <div className="grid md:grid-cols-3 gap-8">
@@ -191,47 +193,43 @@ const Services = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold text-white text-center mb-12">
-              Questions <span className="text-green-400">fréquentes</span>
+              {t('frequentlyAsked')}
             </h2>
             
             <div className="space-y-6">
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4">
-                  Quels sont vos délais d'intervention ?
+                  {t('quickResponse')} ?
                 </h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Je réponds généralement sous 24h maximum. Pour les urgences sécuritaires, 
-                  je peux intervenir dans les plus brefs délais selon ma disponibilité.
+                  {t('quickResponse')} 24h. {t('tryAgainLater')}.
                 </p>
               </div>
 
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4">
-                  Proposez-vous un suivi après la livraison ?
+                  {t('technicalExpertise')} ?
                 </h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Oui, je propose systématiquement un suivi post-livraison avec support technique 
-                  et maintenance corrective pendant une période définie selon le projet.
+                  {t('concreteResults')}.
                 </p>
               </div>
 
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4">
-                  Comment établissez-vous vos tarifs ?
+                  {t('requestQuote')} ?
                 </h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Mes tarifs sont établis en fonction de la complexité du projet, du temps nécessaire 
-                  et des technologies utilisées. Je propose toujours un devis détaillé et transparent.
+                  {t('personalizedApproach')}.
                 </p>
               </div>
 
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4">
-                  Travaillez-vous à distance ?
+                  {t('reactivity')} ?
                 </h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Oui, la plupart de mes missions peuvent être réalisées à distance. Pour certains 
-                  projets nécessitant une présence physique, je peux me déplacer en région parisienne.
+                  {t('reactivity')}.
                 </p>
               </div>
             </div>
@@ -245,25 +243,24 @@ const Services = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
               <h3 className="text-3xl font-bold text-white mb-4">
-                Prêt à sécuriser votre infrastructure ?
+                {t('getStarted')} ?
               </h3>
               <p className="text-gray-300 mb-6 leading-relaxed">
-                Contactez-moi pour discuter de vos besoins et obtenir un devis personnalisé 
-                pour vos projets de cybersécurité et développement Python.
+                {t('contactSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/contact"
                   className="bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 transform hover:scale-105 inline-flex items-center justify-center gap-2"
                 >
-                  Demander un devis
+                  {t('requestQuote')}
                   <ArrowRight size={20} />
                 </Link>
                 <Link
                   to="/projects"
                   className="border-2 border-green-400 text-green-400 px-8 py-4 rounded-lg font-semibold hover:bg-green-400 hover:text-gray-900 transition-all duration-200 transform hover:scale-105 inline-flex items-center justify-center gap-2"
                 >
-                  Voir mes projets
+                  {t('viewMyProjects')}
                 </Link>
               </div>
             </div>

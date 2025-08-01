@@ -1,10 +1,12 @@
 import React from 'react';
 import { ChevronDown, Shield, Code, Network } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import usePersonalInfo from '../hooks/usePersonalInfo';
 import useStatistics from '../hooks/useStatistics';
 import LoadingSpinner from './LoadingSpinner';
 
 const Hero = () => {
+  const { t, td } = useLanguage();
   const { personalInfo, loading: personalLoading } = usePersonalInfo();
   const { statistics, loading: statsLoading } = useStatistics();
   
@@ -36,7 +38,7 @@ const Hero = () => {
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <div className="flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-2">
               <Shield size={16} className="text-green-400" />
-              <span className="text-sm text-gray-300">Cybersécurité</span>
+              <span className="text-sm text-gray-300">{t('cybersecurity')}</span>
             </div>
             <div className="flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-2">
               <Code size={16} className="text-green-400" />
@@ -44,18 +46,18 @@ const Hero = () => {
             </div>
             <div className="flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-2">
               <Network size={16} className="text-green-400" />
-              <span className="text-sm text-gray-300">Réseaux</span>
+              <span className="text-sm text-gray-300">{td('Réseaux')}</span>
             </div>
           </div>
 
           {/* Main Title */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-white">Spécialiste</span>{' '}
+            <span className="text-white">{t('specialist')}</span>{' '}
             <span className="bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
-              Cybersécurité
+              {t('cybersecurity')}
             </span>
             <br />
-            <span className="text-white">& Développeur</span>{' '}
+            <span className="text-white">& {t('developer')}</span>{' '}
             <span className="bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
               Python
             </span>
@@ -63,13 +65,12 @@ const Hero = () => {
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            {personalInfo?.subtitle || "Expert en sécurité numérique et développement d'applications Python"}
+            {personalInfo?.subtitle || t('heroDescription')}
           </p>
 
           {/* Description */}
           <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Expert en sécurité numérique et développement d'applications Python. 
-            J'accompagne les entreprises dans leur transformation digitale sécurisée.
+            {t('heroDescription')}
           </p>
 
           {/* CTA Buttons */}
@@ -78,13 +79,13 @@ const Hero = () => {
               onClick={() => scrollToSection('projects')}
               className="bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 transform hover:scale-105 hover:shadow-lg hover:shadow-green-400/25"
             >
-              Découvrir mes projets
+              {t('discoverProjects')}
             </button>
             <button
               onClick={() => scrollToSection('services')}
               className="border-2 border-green-400 text-green-400 px-8 py-4 rounded-lg font-semibold hover:bg-green-400 hover:text-gray-900 transition-all duration-200 transform hover:scale-105"
             >
-              Mes services
+              {t('myServices')}
             </button>
           </div>
 
@@ -93,10 +94,10 @@ const Hero = () => {
             {statistics.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">
-                  {stat.value}
+                  {stat.value}{stat.suffix}
                 </div>
                 <div className="text-sm text-gray-400">
-                  {stat.label}
+                  {td(stat.title)}
                 </div>
               </div>
             ))}

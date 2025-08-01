@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Hash, Lock, Network, Shield, Link, Code, Play, Copy, CheckCircle, AlertTriangle, CheckCircle2, ExternalLink, Save, History, Download, Trash2 } from 'lucide-react';
 import CryptoJS from 'crypto-js';
+import { useLanguage } from '../context/LanguageContext';
 
 const InteractiveTools = () => {
+  const { t } = useLanguage();
+  
   const [activeTab, setActiveTab] = useState('hash');
   const [copiedText, setCopiedText] = useState('');
 
@@ -42,13 +45,13 @@ const InteractiveTools = () => {
   const [showHistory, setShowHistory] = useState(false);
 
   const tools = [
-    { id: 'hash', name: 'Générateur de Hash', icon: Hash, description: 'Générez des hashes MD5, SHA1, SHA256' },
-    { id: 'password', name: 'Analyseur de Mots de Passe', icon: Lock, description: 'Vérifiez la force des mots de passe' },
-    { id: 'ports', name: 'Scanner de Ports', icon: Network, description: 'Simulation de scan de ports' },
-    { id: 'cipher', name: 'Chiffreur/Déchiffreur', icon: Shield, description: 'Chiffrement/déchiffrement AES' },
-    { id: 'url', name: 'Analyseur d\'URL', icon: Link, description: 'Analysez la structure des URLs' },
-    { id: 'xss', name: 'Détecteur XSS', icon: Shield, description: 'Détectez les vulnérabilités XSS potentielles' },
-    { id: 'json', name: 'Validateur JSON', icon: Code, description: 'Validez et formatez du JSON' }
+    { id: 'hash', name: t('hashGenerator'), icon: Hash, description: t('hashGeneratorDesc') },
+    { id: 'password', name: t('passwordAnalyzer'), icon: Lock, description: t('passwordAnalyzerDesc') },
+    { id: 'ports', name: t('portScanner'), icon: Network, description: t('portScannerDesc') },
+    { id: 'cipher', name: t('cipherTool'), icon: Shield, description: t('cipherToolDesc') },
+    { id: 'url', name: t('urlAnalyzer'), icon: Link, description: t('urlAnalyzerDesc') },
+    { id: 'xss', name: t('xssDetector'), icon: Shield, description: t('xssDetectorDesc') },
+    { id: 'json', name: t('jsonValidator'), icon: Code, description: t('jsonValidatorDesc') }
   ];
 
   const copyToClipboard = async (text) => {
@@ -73,7 +76,6 @@ const InteractiveTools = () => {
     }
   }, []);
 
-  // Save results to localStorage
   const saveResult = (toolName, input, result, metadata = {}) => {
     const newResult = {
       id: Date.now().toString(),
@@ -82,8 +84,8 @@ const InteractiveTools = () => {
       result: typeof result === 'string' ? result : JSON.stringify(result, null, 2),
       metadata,
       timestamp: new Date().toISOString(),
-      date: new Date().toLocaleDateString('fr-FR'),
-      time: new Date().toLocaleTimeString('fr-FR')
+      date: new Date().toLocaleDateString(t('language') === 'fr' ? 'fr-FR' : 'en-US'),
+      time: new Date().toLocaleTimeString(t('language') === 'fr' ? 'fr-FR' : 'en-US')
     };
 
     const updatedResults = [newResult, ...savedResults].slice(0, 50); // Keep only last 50 results
@@ -136,7 +138,7 @@ const InteractiveTools = () => {
 
   const saveHashResults = () => {
     if (Object.keys(hashResults).length > 0) {
-      saveResult('Générateur de Hash', hashInput, hashResults, {
+      saveResult(t('hashGenerator'), hashInput, hashResults, {
         algorithms: Object.keys(hashResults),
         inputLength: hashInput.length
       });
@@ -157,30 +159,33 @@ const InteractiveTools = () => {
     
     // Length check
     if (pwd.length >= 8) score += 1;
-    else feedback.push('Au moins 8 caractères');
+    else feedback.push(t('atLeast8Chars'));
     
     if (pwd.length >= 12) score += 1;
     
     // Character variety
     if (/[a-z]/.test(pwd)) score += 1;
-    else feedback.push('Lettres minuscules');
+    else feedback.push(t('lowercaseLetters'));
     
     if (/[A-Z]/.test(pwd)) score += 1;
-    else feedback.push('Lettres majuscules');
+    else feedback.push(t('uppercaseLetters'));
     
     if (/[0-9]/.test(pwd)) score += 1;
-    else feedback.push('Chiffres');
+    else feedback.push(t('numbers'));
     
     if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
-    else feedback.push('Caractères spéciaux');
+    else feedback.push(t('specialChars'));
 
     // Common patterns check
     if (!/(.)\1{2,}/.test(pwd)) score += 1;
-    else feedback.push('Éviter les répétitions');
+    else feedback.push(t('avoidRepetitions'));
 
     const strength = {
       score,
-      level: score <= 2 ? 'Faible' : score <= 4 ? 'Moyen' : score <= 6 ? 'Fort' : 'Très Fort',
+      level: score <= 2 ? t('passwordStrengthWeak') : 
+             score <= 4 ? t('passwordStrengthMedium') : 
+             score <= 6 ? t('passwordStrengthStrong') : 
+             t('passwordStrengthVeryStrong'),
       color: score <= 2 ? 'red' : score <= 4 ? 'yellow' : score <= 6 ? 'green' : 'emerald',
       feedback,
       entropy: Math.log2(Math.pow(95, pwd.length)).toFixed(1)
@@ -191,7 +196,7 @@ const InteractiveTools = () => {
 
   const savePasswordResults = () => {
     if (passwordStrength) {
-      saveResult('Analyseur de Mots de Passe', password.replace(/./g, '*'), passwordStrength, {
+      saveResult(t('passwordAnalyzer'), password.replace(/./g, '*'), passwordStrength, {
         level: passwordStrength.level,
         score: passwordStrength.score,
         entropy: passwordStrength.entropy
@@ -203,7 +208,7 @@ const InteractiveTools = () => {
   const savePortScanResults = () => {
     if (portScanResults.length > 0) {
       const openPorts = portScanResults.filter(result => result.status === 'Open');
-      saveResult('Scanner de Ports', targetHost, portScanResults, {
+      saveResult(t('portScanner'), targetHost, portScanResults, {
         target: targetHost,
         totalPorts: portScanResults.length,
         openPorts: openPorts.length,
@@ -214,8 +219,8 @@ const InteractiveTools = () => {
 
   // Save cipher results
   const saveCipherResults = () => {
-    if (cipherResult && cipherResult !== 'Erreur lors du chiffrement/déchiffrement') {
-      saveResult('Chiffreur/Déchiffreur AES', cipherText, cipherResult, {
+    if (cipherResult && cipherResult !== t('errorCipherOperation')) {
+      saveResult(t('cipherTool'), cipherText, cipherResult, {
         mode: cipherMode,
         inputLength: cipherText.length,
         outputLength: cipherResult.length
@@ -226,7 +231,7 @@ const InteractiveTools = () => {
   // Save URL analysis results
   const saveUrlAnalysisResults = () => {
     if (urlAnalysis && !urlAnalysis.error) {
-      saveResult('Analyseur d\'URL', urlInput, urlAnalysis, {
+      saveResult(t('urlAnalyzer'), urlInput, urlAnalysis, {
         protocol: urlAnalysis.protocol,
         hostname: urlAnalysis.hostname,
         isSecure: urlAnalysis.isSecure,
@@ -238,7 +243,7 @@ const InteractiveTools = () => {
   // Save XSS detection results
   const saveXssResults = () => {
     if (xssResults) {
-      saveResult('Détecteur XSS', xssInput, xssResults, {
+      saveResult(t('xssDetector'), xssInput, xssResults, {
         riskLevel: xssResults.riskLevel,
         securityScore: xssResults.securityScore,
         threatsFound: xssResults.threatsFound
@@ -249,7 +254,7 @@ const InteractiveTools = () => {
   // Save JSON validation results
   const saveJsonResults = () => {
     if (jsonResults) {
-      saveResult('Validateur JSON', jsonInput, jsonResults, {
+      saveResult(t('jsonValidator'), jsonInput, jsonResults, {
         isValid: jsonResults.isValid,
         type: jsonResults.analysis?.type,
         size: jsonResults.analysis?.size
@@ -307,12 +312,12 @@ const InteractiveTools = () => {
         const bytes = CryptoJS.AES.decrypt(cipherText, cipherKey);
         result = bytes.toString(CryptoJS.enc.Utf8);
         if (!result) {
-          result = 'Erreur: Clé incorrecte ou texte invalide';
+          result = t('errorIncorrectKey');
         }
       }
       setCipherResult(result);
     } catch (error) {
-      setCipherResult('Erreur lors du chiffrement/déchiffrement');
+      setCipherResult(t('errorCipherOperation'));
     }
   };
 
@@ -337,7 +342,7 @@ const InteractiveTools = () => {
       };
       setUrlAnalysis(analysis);
     } catch (error) {
-      setUrlAnalysis({ error: 'URL invalide' });
+      setUrlAnalysis({ error: t('invalidUrl') });
     }
   };
 
@@ -428,23 +433,23 @@ const InteractiveTools = () => {
     const recommendations = [];
     
     if (threats.some(t => t.type.includes('Script'))) {
-      recommendations.push('Échappez ou supprimez les balises <script>');
+      recommendations.push(t('escapeScriptTags'));
     }
     if (threats.some(t => t.type.includes('Event Handler'))) {
-      recommendations.push('Supprimez les gestionnaires d\'événements inline (onclick, onload, etc.)');
+      recommendations.push(t('removeEventHandlers'));
     }
     if (threats.some(t => t.type.includes('JavaScript URL'))) {
-      recommendations.push('Évitez les URLs javascript:');
+      recommendations.push(t('avoidJsUrls'));
     }
     if (threats.some(t => t.type.includes('IFrame'))) {
-      recommendations.push('Validez les sources des iframes');
+      recommendations.push(t('validateIframeSources'));
     }
     if (threats.length === 0) {
-      recommendations.push('Le contenu semble sûr, mais restez vigilant');
+      recommendations.push(t('contentSafe'));
     }
     
-    recommendations.push('Utilisez toujours l\'échappement HTML approprié');
-    recommendations.push('Implémentez une Content Security Policy (CSP)');
+    recommendations.push(t('useHtmlEscaping'));
+    recommendations.push(t('implementCSP'));
     
     return recommendations;
   };
@@ -540,17 +545,17 @@ const InteractiveTools = () => {
     const suggestions = [];
     
     if (errorMessage.includes('Unexpected token')) {
-      suggestions.push('Vérifiez les virgules manquantes ou en trop');
-      suggestions.push('Assurez-vous que les chaînes sont entre guillemets doubles');
+      suggestions.push(t('checkMissingCommas'));
+      suggestions.push(t('useDoubleQuotes'));
     }
     if (errorMessage.includes('Unexpected end')) {
-      suggestions.push('Vérifiez les accolades ou crochets manquants');
+      suggestions.push(t('checkMissingBrackets'));
     }
     if (errorMessage.includes('string')) {
-      suggestions.push('Les chaînes doivent être entre guillemets doubles (")');
+      suggestions.push(t('stringsNeedQuotes'));
     }
     
-    suggestions.push('Utilisez un validateur JSON en ligne pour identifier l\'erreur');
+    suggestions.push(t('useOnlineValidator'));
     
     return suggestions;
   };
@@ -565,23 +570,23 @@ const InteractiveTools = () => {
               <Code size={32} className="text-gray-900" />
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Outils <span className="text-green-400">Interactifs</span>
+              {t('interactiveToolsTitle')} <span className="text-green-400"></span>
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
-              Découvrez des outils de cybersécurité fonctionnels développés en temps réel
+              {t('interactiveToolsSubtitle')}
             </p>
             
             {/* Integration link to projects */}
             <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-4 max-w-2xl mx-auto">
               <p className="text-gray-300 text-sm mb-3">
-                Ces outils font partie de mon projet :
+                {t('interactiveToolsDesc')}
               </p>
               <a 
                 href="/projects" 
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-4 py-2 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 text-sm"
               >
                 <Shield size={16} />
-                Plateforme d'Outils Interactifs de Cybersécurité
+                {t('freeOnlineTools')}
               </a>
             </div>
           </div>
@@ -595,41 +600,37 @@ const InteractiveTools = () => {
             {/* Tools History & Save Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-semibold text-white">Outils de Cybersécurité</h3>
+                <h3 className="text-lg font-semibold text-white">{t('interactiveToolsTitle')}</h3>
                 <span className="text-sm text-gray-400">
-                  {savedResults.length} résultat{savedResults.length !== 1 ? 's' : ''} sauvegardé{savedResults.length !== 1 ? 's' : ''}
+                  {savedResults.length} {t('savedResults')}
                 </span>
               </div>
               
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => setShowHistory(!showHistory)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    showHistory
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                  className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
                 >
                   <History size={16} />
-                  Historique
+                  {showHistory ? t('hideHistory') : t('showHistory')}
                 </button>
                 
                 {savedResults.length > 0 && (
                   <>
                     <button
                       onClick={exportResults}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-all duration-200"
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
                     >
                       <Download size={16} />
-                      Exporter
+                      {t('exportResults')}
                     </button>
                     
                     <button
                       onClick={clearAllResults}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all duration-200"
+                      className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
                     >
                       <Trash2 size={16} />
-                      Effacer tout
+                      {t('clearAllResults')}
                     </button>
                   </>
                 )}
@@ -641,7 +642,7 @@ const InteractiveTools = () => {
               <div className="mb-8 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                   <History className="text-green-400" />
-                  Historique des résultats
+                  {t('resultsHistory')}
                 </h3>
                 
                 {savedResults.length === 0 ? (
@@ -649,8 +650,8 @@ const InteractiveTools = () => {
                     <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
                       <History size={24} className="text-gray-500" />
                     </div>
-                    <p className="text-gray-400">Aucun résultat sauvegardé</p>
-                    <p className="text-sm text-gray-500">Utilisez les outils ci-dessous et sauvegardez vos résultats</p>
+                    <p className="text-gray-400">{t('noSavedResults')}</p>
+                    <p className="text-sm text-gray-500">{t('useToolsBelow')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -665,14 +666,14 @@ const InteractiveTools = () => {
                             <button
                               onClick={() => copyToClipboard(result.result)}
                               className="text-gray-400 hover:text-white transition-colors"
-                              title="Copier le résultat"
+                              title={t('copyResult')}
                             >
                               <Copy size={14} />
                             </button>
                             <button
                               onClick={() => deleteSavedResult(result.id)}
                               className="text-gray-400 hover:text-red-400 transition-colors"
-                              title="Supprimer"
+                              title={t('deleteResult')}
                             >
                               <Trash2 size={14} />
                             </button>
@@ -733,20 +734,20 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Hash className="text-green-400" />
-                  Générateur de Hash
+                  {t('hashGeneratorTitle')}
                 </h2>
                 
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Texte à hasher
+                      {t('enterTextToHash')}
                     </label>
                     <div className="flex gap-4">
                       <input
                         type="text"
                         value={hashInput}
                         onChange={(e) => setHashInput(e.target.value)}
-                        placeholder="Entrez votre texte..."
+                        placeholder={t('enterTextPlaceholder')}
                         className="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400"
                       />
                       <button
@@ -754,7 +755,7 @@ const InteractiveTools = () => {
                         className="bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 flex items-center gap-2"
                       >
                         <Play size={16} />
-                        Générer
+                        {t('generate')}
                       </button>
                     </div>
                   </div>
@@ -770,7 +771,7 @@ const InteractiveTools = () => {
                               className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
                             >
                               {copiedText === hash ? <CheckCircle size={16} /> : <Copy size={16} />}
-                              {copiedText === hash ? 'Copié!' : 'Copier'}
+                              {copiedText === hash ? t('copied') : t('copy')}
                             </button>
                           </div>
                           <code className="text-gray-300 text-sm break-all font-mono">{hash}</code>
@@ -786,12 +787,12 @@ const InteractiveTools = () => {
                           {copiedText === 'saved' ? (
                             <>
                               <CheckCircle size={16} />
-                              Sauvegardé!
+                              {t('saved')}
                             </>
                           ) : (
                             <>
                               <Save size={16} />
-                              Sauvegarder les résultats
+                              {t('saveHashResults')}
                             </>
                           )}
                         </button>
@@ -807,19 +808,19 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Lock className="text-green-400" />
-                  Analyseur de Mots de Passe
+                  {t('passwordAnalyzerTitle')}
                 </h2>
                 
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Mot de passe à analyser
+                      {t('passwordToAnalyze')}
                     </label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => checkPasswordStrength(e.target.value)}
-                      placeholder="Entrez un mot de passe..."
+                      placeholder={t('passwordPlaceholder')}
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400"
                     />
                   </div>
@@ -827,7 +828,7 @@ const InteractiveTools = () => {
                   {passwordStrength && (
                     <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-white">Résultat de l'analyse</h3>
+                        <h3 className="text-lg font-semibold text-white">{t('analysisResult')}</h3>
                         <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                           passwordStrength.color === 'red' ? 'bg-red-500 text-white' :
                           passwordStrength.color === 'yellow' ? 'bg-yellow-500 text-gray-900' :
@@ -908,26 +909,26 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Network className="text-green-400" />
-                  Scanner de Ports (Simulation)
+                  {t('portScannerSimulation')}
                 </h2>
                 
                 <div className="space-y-6">
                   <div className="bg-yellow-600/20 border border-yellow-500 rounded-lg p-4">
                     <p className="text-yellow-200 text-sm">
-                      ⚠️ Ceci est une simulation éducative. En pratique, ne scannez que vos propres systèmes ou avec autorisation.
+                      {t('educationalSimulation')}
                     </p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Adresse IP ou nom d'hôte cible
+                      {t('targetHostLabel')}
                     </label>
                     <div className="flex gap-4">
                       <input
                         type="text"
                         value={targetHost}
                         onChange={(e) => setTargetHost(e.target.value)}
-                        placeholder="192.168.1.1 ou example.com"
+                        placeholder={t('targetHostPlaceholder')}
                         className="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400"
                       />
                       <button
@@ -1003,7 +1004,7 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Shield className="text-green-400" />
-                  Chiffreur/Déchiffreur AES
+                  {t('cipherToolAES')}
                 </h2>
                 
                 <div className="space-y-6">
@@ -1016,7 +1017,7 @@ const InteractiveTools = () => {
                           : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
-                      Chiffrer
+                      {t('encryptMode')}
                     </button>
                     <button
                       onClick={() => setCipherMode('decrypt')}
@@ -1026,7 +1027,7 @@ const InteractiveTools = () => {
                           : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
-                      Déchiffrer
+                      {t('decryptMode')}
                     </button>
                   </div>
                   
@@ -1115,13 +1116,13 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Link className="text-green-400" />
-                  Analyseur d'URL
+                  {t('urlAnalyzerTitle')}
                 </h2>
                 
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      URL à analyser
+                      {t('urlToAnalyze')}
                     </label>
                     <div className="flex gap-4">
                       <input
@@ -1244,13 +1245,13 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Shield className="text-green-400" />
-                  Détecteur XSS
+                  {t('xssDetectorTitle')}
                 </h2>
                 
                 <div className="space-y-6">
                   <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-4">
                     <p className="text-blue-200 text-sm">
-                      ℹ️ Cet outil détecte les patterns XSS potentiels dans le code HTML/JavaScript à des fins éducatives.
+                      {t('xssEducationalNote')}
                     </p>
                   </div>
                   
@@ -1391,7 +1392,7 @@ const InteractiveTools = () => {
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
                   <Code className="text-green-400" />
-                  Validateur JSON
+                  {t('jsonValidatorTitle')}
                 </h2>
                 
                 <div className="space-y-6">

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Github, ExternalLink, Code, Shield, Network, Globe, Filter, Clock, Star } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import useProjects from '../hooks/useProjects';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Projects = () => {
+  const { t, td } = useLanguage();
   const { projects, loading } = useProjects();
   const [activeFilter, setActiveFilter] = useState('all');
   const [activeLevelFilter, setActiveLevelFilter] = useState('all');
@@ -13,18 +15,18 @@ const Projects = () => {
   }
 
   const categories = [
-    { id: 'all', name: 'Tous', icon: Globe },
-    { id: 'Cybersécurité', name: 'Cybersécurité', icon: Shield },
+    { id: 'all', name: t('allProjects'), icon: Globe },
+    { id: 'Cybersécurité', name: td('Cybersécurité'), icon: Shield },
     { id: 'Python', name: 'Python', icon: Code },
-    { id: 'Réseaux', name: 'Réseaux', icon: Network },
-    { id: 'Forensique', name: 'Forensique', icon: Shield }
+    { id: 'Réseaux', name: td('Réseaux'), icon: Network },
+    { id: 'Forensique', name: td('Forensique'), icon: Shield }
   ];
 
   const levels = [
-    { id: 'all', name: 'Tous niveaux' },
-    { id: 'Débutant', name: 'Débutant' },
-    { id: 'Intermédiaire', name: 'Intermédiaire' },
-    { id: 'Avancé', name: 'Avancé' }
+    { id: 'all', name: t('allLevels') },
+    { id: 'Débutant', name: td('Débutant') },
+    { id: 'Intermédiaire', name: td('Intermédiaire') },
+    { id: 'Avancé', name: td('Avancé') }
   ];
 
   const filteredProjects = projects.filter(project => {
@@ -68,10 +70,10 @@ const Projects = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Mes <span className="text-green-400">projets</span>
+              {t('myProjects')}
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              Découvrez mes réalisations techniques en cybersécurité, Python et développement
+              {t('projectsSubtitle')}
             </p>
           </div>
         </div>
@@ -85,7 +87,7 @@ const Projects = () => {
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <Filter size={20} />
-                Filtrer par catégorie
+                {t('filterByCategory')}
               </h3>
               <div className="flex flex-wrap gap-4">
                 {categories.map((category) => (
@@ -109,7 +111,7 @@ const Projects = () => {
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <Star size={20} />
-                Filtrer par niveau
+                {t('filterByLevel')}
               </h3>
               <div className="flex flex-wrap gap-4">
                 {levels.map((level) => (
@@ -131,7 +133,7 @@ const Projects = () => {
             {/* Projects Count */}
             <div className="mb-8">
               <p className="text-gray-400">
-                {filteredProjects.length} projet{filteredProjects.length !== 1 ? 's' : ''} trouvé{filteredProjects.length !== 1 ? 's' : ''}
+                {filteredProjects.length} {t('allProjects').toLowerCase()}{filteredProjects.length !== 1 ? 's' : ''} {t('dataNotAvailable').includes('trouvé') ? 'trouvé' : 'found'}{filteredProjects.length !== 1 ? 's' : ''}
               </p>
             </div>
 
@@ -155,28 +157,28 @@ const Projects = () => {
                           <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors">
                             {project.title}
                           </h3>
-                          <span className="text-sm text-gray-400">{project.category}</span>
+                          <span className="text-sm text-gray-400">{td(project.category)}</span>
                         </div>
                       </div>
                       <div className="flex flex-col gap-2">
                         <div className={`px-2 py-1 rounded-full text-xs font-semibold text-white ${getStatusColor(project.status)}`}>
-                          {project.status}
+                          {td(project.status)}
                         </div>
                         <div className={`px-2 py-1 rounded-full text-xs font-semibold text-white ${getLevelColor(project.level)}`}>
-                          {project.level}
+                          {td(project.level)}
                         </div>
                       </div>
                     </div>
 
                     {/* Description */}
                     <p className="text-gray-300 mb-4 leading-relaxed">
-                      {project.description}
+                      {td(project.description)}
                     </p>
 
                     {/* Duration */}
                     <div className="flex items-center gap-2 mb-4 text-gray-400">
                       <Clock size={14} />
-                      <span className="text-sm">{project.duration}</span>
+                      <span className="text-sm">{t('duration')}: {project.duration}</span>
                     </div>
 
                     {/* Technologies */}
@@ -193,17 +195,17 @@ const Projects = () => {
 
                     {/* Features */}
                     <div className="mb-6">
-                      <h4 className="text-sm font-semibold text-white mb-2">Fonctionnalités clés :</h4>
+                      <h4 className="text-sm font-semibold text-white mb-2">{t('keyFeatures')} :</h4>
                       <ul className="space-y-1">
                         {project.features.slice(0, 3).map((feature, featureIndex) => (
                           <li key={featureIndex} className="text-sm text-gray-400 flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                            {feature}
+                            {td(feature)}
                           </li>
                         ))}
                         {project.features.length > 3 && (
                           <li className="text-sm text-gray-500 italic">
-                            +{project.features.length - 3} autres fonctionnalités
+                            +{project.features.length - 3} {t('seeMore').toLowerCase()}
                           </li>
                         )}
                       </ul>
@@ -230,7 +232,7 @@ const Projects = () => {
                           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 rounded-lg hover:from-green-500 hover:to-cyan-500 transition-all duration-200 text-sm font-medium"
                         >
                           <ExternalLink size={16} />
-                          Démo
+                          {t('preview')}
                         </a>
                       )}
                     </div>
@@ -245,8 +247,8 @@ const Projects = () => {
                 <div className="w-16 h-16 bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Code size={32} className="text-gray-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-300 mb-2">Aucun projet trouvé</h3>
-                <p className="text-gray-500">Essayez de modifier vos filtres de recherche</p>
+                <h3 className="text-xl font-bold text-gray-300 mb-2">{t('dataNotAvailable')}</h3>
+                <p className="text-gray-500">{t('tryAgainLater')}</p>
               </div>
             )}
           </div>
@@ -258,7 +260,7 @@ const Projects = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-white text-center mb-12">
-              Statistiques des <span className="text-green-400">projets</span>
+              {t('myProjects')} <span className="text-green-400">{t('dataNotAvailable').toLowerCase()}</span>
             </h2>
             
             <div className="grid md:grid-cols-4 gap-8">
@@ -266,28 +268,28 @@ const Projects = () => {
                 <div className="text-4xl font-bold text-green-400 mb-2">
                   {projects.length}
                 </div>
-                <div className="text-gray-400">Projets totaux</div>
+                <div className="text-gray-400">{t('allProjects')}</div>
               </div>
               
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center">
                 <div className="text-4xl font-bold text-green-400 mb-2">
                   {projects.filter(p => p.status === 'Terminé').length}
                 </div>
-                <div className="text-gray-400">Terminés</div>
+                <div className="text-gray-400">{td('Terminé')}</div>
               </div>
               
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center">
                 <div className="text-4xl font-bold text-yellow-400 mb-2">
                   {projects.filter(p => p.status === 'En cours').length}
                 </div>
-                <div className="text-gray-400">En cours</div>
+                <div className="text-gray-400">{td('En cours')}</div>
               </div>
               
               <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center">
                 <div className="text-4xl font-bold text-blue-400 mb-2">
                   {projects.filter(p => p.status === 'Planifié').length}
                 </div>
-                <div className="text-gray-400">Planifiés</div>
+                <div className="text-gray-400">{td('Planifié')}</div>
               </div>
             </div>
           </div>

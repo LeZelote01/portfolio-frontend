@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Linkedin, Github, Twitter, Clock, Check, MessageCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import usePersonalInfo from '../hooks/usePersonalInfo';
 import useSocialLinks from '../hooks/useSocialLinks';
 import LoadingSpinner from '../components/LoadingSpinner';
+import TestimonialForm from '../components/TestimonialForm';
 
 const Contact = () => {
+  const { t, td } = useLanguage();
   const { personalInfo, loading: personalLoading } = usePersonalInfo();
   const { socialLinks, loading: socialLoading } = useSocialLinks();
   
@@ -68,10 +71,10 @@ const Contact = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Contactez-<span className="text-green-400">moi</span>
+              {t('contactMe')}
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              Discutons de vos besoins en cybersécurité et développement Python
+              {t('contactSubtitle')}
             </p>
           </div>
         </div>
@@ -87,7 +90,7 @@ const Contact = () => {
                 {/* Contact Details */}
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                   <h2 className="text-3xl font-bold text-white mb-6">
-                    Informations de contact
+                    {t('contactInfo')}
                   </h2>
                   
                   <div className="space-y-6">
@@ -96,7 +99,7 @@ const Contact = () => {
                         <Mail size={24} className="text-gray-900" />
                       </div>
                       <div>
-                        <h4 className="text-white font-semibold">Email</h4>
+                        <h4 className="text-white font-semibold">{t('email')}</h4>
                         <p className="text-gray-300">{personalInfo?.email || 'contact@jeanyves.dev'}</p>
                       </div>
                     </div>
@@ -106,7 +109,7 @@ const Contact = () => {
                         <Phone size={24} className="text-gray-900" />
                       </div>
                       <div>
-                        <h4 className="text-white font-semibold">Téléphone</h4>
+                        <h4 className="text-white font-semibold">{t('phone')}</h4>
                         <p className="text-gray-300">{personalInfo?.phone || '+33 6 12 34 56 78'}</p>
                       </div>
                     </div>
@@ -116,7 +119,7 @@ const Contact = () => {
                         <MapPin size={24} className="text-gray-900" />
                       </div>
                       <div>
-                        <h4 className="text-white font-semibold">Localisation</h4>
+                        <h4 className="text-white font-semibold">{t('location')}</h4>
                         <p className="text-gray-300">{personalInfo?.location || 'Paris, France'}</p>
                       </div>
                     </div>
@@ -126,7 +129,7 @@ const Contact = () => {
                         <Clock size={24} className="text-gray-900" />
                       </div>
                       <div>
-                        <h4 className="text-white font-semibold">Disponibilité</h4>
+                        <h4 className="text-white font-semibold">{t('availability')}</h4>
                         <p className="text-gray-300">{personalInfo?.availability || 'Disponible pour missions freelance'}</p>
                       </div>
                     </div>
@@ -136,7 +139,7 @@ const Contact = () => {
                 {/* Social Links */}
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                   <h3 className="text-2xl font-bold text-white mb-6">
-                    Réseaux sociaux
+                    {t('socialNetworks')}
                   </h3>
                   
                   <div className="flex gap-4">
@@ -161,25 +164,25 @@ const Contact = () => {
                 <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                   <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                     <MessageCircle size={24} />
-                    Réponse rapide
+                    {t('quickResponse')}
                   </h3>
                   
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <Check size={16} className="text-green-400" />
-                      <span className="text-gray-300">Réponse sous 24h maximum</span>
+                      <span className="text-gray-300">{t('responseWithin24h')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check size={16} className="text-green-400" />
-                      <span className="text-gray-300">Devis gratuit et sans engagement</span>
+                      <span className="text-gray-300">{t('freeQuoteNoCommitment')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check size={16} className="text-green-400" />
-                      <span className="text-gray-300">Consultation initiale offerte</span>
+                      <span className="text-gray-300">{t('freeInitialConsultation')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check size={16} className="text-green-400" />
-                      <span className="text-gray-300">Support technique inclus</span>
+                      <span className="text-gray-300">{t('technicalSupportIncluded')}</span>
                     </div>
                   </div>
                 </div>
@@ -188,14 +191,14 @@ const Contact = () => {
               {/* Contact Form */}
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
                 <h3 className="text-3xl font-bold text-white mb-6">
-                  Envoyez-moi un message
+                  {t('sendMessage')}
                 </h3>
 
                 {isSubmitted && (
                   <div className="mb-6 p-4 bg-green-500/20 border border-green-500 rounded-lg flex items-center gap-3">
                     <Check size={20} className="text-green-400" />
                     <span className="text-green-400">
-                      Message envoyé avec succès ! Je vous répondrai rapidement.
+                      {t('messageSentSuccess')}
                     </span>
                   </div>
                 )}
@@ -204,7 +207,7 @@ const Contact = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-                        Nom complet *
+                        {t('fullName')} *
                       </label>
                       <input
                         type="text"
@@ -214,12 +217,12 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
-                        placeholder="Votre nom"
+                        placeholder={t('yourName')}
                       />
                     </div>
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                        Email *
+                        {t('email')} *
                       </label>
                       <input
                         type="email"
@@ -229,14 +232,14 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
-                        placeholder="votre@email.com"
+                        placeholder={t('yourEmail')}
                       />
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="service" className="block text-sm font-medium text-gray-300 mb-2">
-                      Service d'intérêt
+                      {t('serviceOfInterest')}
                     </label>
                     <select
                       id="service"
@@ -245,18 +248,18 @@ const Contact = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
                     >
-                      <option value="">Sélectionnez un service</option>
-                      <option value="audit">Audit de sécurité</option>
-                      <option value="development">Développement Python</option>
-                      <option value="infrastructure">Sécurisation d'infrastructure</option>
-                      <option value="consulting">Consulting & Formation</option>
-                      <option value="other">Autre</option>
+                      <option value="">{t('selectService')}</option>
+                      <option value="audit">{t('securityAudit')}</option>
+                      <option value="development">{t('pythonDevelopment')}</option>
+                      <option value="infrastructure">{t('infrastructureSecurity')}</option>
+                      <option value="consulting">{t('consultingTraining')}</option>
+                      <option value="other">{t('other')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
-                      Sujet *
+                      {t('subject')} *
                     </label>
                     <input
                       type="text"
@@ -266,13 +269,13 @@ const Contact = () => {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
-                      placeholder="Sujet de votre message"
+                      placeholder={t('subjectOfMessage')}
                     />
                   </div>
 
                   <div>
                     <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
-                      Message *
+                      {t('message')} *
                     </label>
                     <textarea
                       id="message"
@@ -282,7 +285,7 @@ const Contact = () => {
                       required
                       rows={6}
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent resize-none transition-all duration-200"
-                      placeholder="Décrivez votre projet ou vos besoins..."
+                      placeholder={t('describeProject')}
                     />
                   </div>
 
@@ -294,12 +297,12 @@ const Contact = () => {
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-                        Envoi en cours...
+                        {t('sendingMessage')}
                       </>
                     ) : (
                       <>
                         <Send size={20} />
-                        Envoyer le message
+                        {t('sendMessageBtn')}
                       </>
                     )}
                   </button>
@@ -307,6 +310,22 @@ const Contact = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Testimonial Section */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('shareExperience')}
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              {t('helpOthers')}
+            </p>
+          </div>
+          
+          <TestimonialForm />
         </div>
       </section>
     </div>

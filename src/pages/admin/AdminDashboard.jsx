@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Alert, AlertDescription } from '../../components/ui/alert';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   Users, Code, Shield, Clock, LogOut, User, 
   FolderOpen, Briefcase, MessageSquare, Settings,
-  BarChart3, Activity, TrendingUp
+  BarChart3, Activity, TrendingUp, Sun, Moon, FileText, BookOpen
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -21,6 +22,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   useEffect(() => {
     fetchUserData();
@@ -141,8 +143,50 @@ const AdminDashboard = () => {
       color: 'bg-pink-500'
     },
     {
+      title: 'Technologies',
+      description: 'Gérer les technologies et outils',
+      icon: Code,
+      path: '/admin/technologies',
+      color: 'bg-indigo-500'
+    },
+    {
+      title: 'Statistiques',
+      description: 'Gérer les statistiques du portfolio',
+      icon: BarChart3,
+      path: '/admin/statistics',
+      color: 'bg-cyan-500'
+    },
+    {
+      title: 'Liens sociaux',
+      description: 'Gérer les réseaux sociaux',
+      icon: Users,
+      path: '/admin/social-links',
+      color: 'bg-teal-500'
+    },
+    {
+      title: 'Étapes de processus',
+      description: 'Gérer le processus de travail',
+      icon: Activity,
+      path: '/admin/process-steps',
+      color: 'bg-emerald-500'
+    },
+    {
+      title: 'Ressources',
+      description: 'Gérer les ressources téléchargeables',
+      icon: FileText,
+      path: '/admin/resources',
+      color: 'bg-blue-600'
+    },
+    {
+      title: 'Blog Technique',
+      description: 'Gérer les articles du blog',
+      icon: BookOpen,
+      path: '/admin/blog',
+      color: 'bg-purple-600'
+    },
+    {
       title: 'Paramètres',
-      description: 'Configuration générale du système',
+      description: 'Gestion du compte administrateur et préférences',
       icon: Settings,
       path: '/admin/settings',
       color: 'bg-gray-500'
@@ -161,15 +205,17 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
+      <header className="bg-white/80 backdrop-blur-lg dark:bg-gray-800/80 shadow-lg border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <Shield className="h-8 w-8 text-primary mr-3" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <div className="ml-4">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                   Administration
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -178,8 +224,18 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <Button
+                variant="outline"
+                onClick={toggleTheme}
+                className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                title={isDark ? "Mode clair" : "Mode sombre"}
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+              
               {user && (
-                <div className="text-right">
+                <div className="text-right px-4 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {user.username}
                   </p>
@@ -188,7 +244,7 @@ const AdminDashboard = () => {
                   </p>
                 </div>
               )}
-              <Button variant="outline" onClick={handleLogout}>
+              <Button variant="outline" onClick={handleLogout} className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors">
                 <LogOut className="h-4 w-4 mr-2" />
                 Déconnexion
               </Button>
@@ -197,18 +253,20 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         {error && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert variant="destructive" className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/20">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         {/* Statistiques */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <CardContent className="flex items-center p-6">
-              <FolderOpen className="h-8 w-8 text-green-600" />
+              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <FolderOpen className="h-8 w-8 text-green-600 dark:text-green-400" />
+              </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Projets
@@ -220,9 +278,11 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <CardContent className="flex items-center p-6">
-              <Code className="h-8 w-8 text-purple-600" />
+              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <Code className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Compétences
@@ -234,9 +294,11 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <CardContent className="flex items-center p-6">
-              <Briefcase className="h-8 w-8 text-orange-600" />
+              <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+              </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Services
@@ -248,9 +310,11 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <CardContent className="flex items-center p-6">
-              <MessageSquare className="h-8 w-8 text-pink-600" />
+              <div className="p-3 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
+                <MessageSquare className="h-8 w-8 text-pink-600 dark:text-pink-400" />
+              </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Témoignages
@@ -265,22 +329,23 @@ const AdminDashboard = () => {
 
         {/* Actions rapides */}
         <div className="mb-8">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+            <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
             Actions rapides
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quickActions.map((action, index) => (
               <Card 
                 key={index} 
-                className="cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 group"
                 onClick={() => navigate(action.path)}
               >
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
-                    <div className={`p-2 rounded-lg ${action.color}`}>
+                    <div className={`p-3 rounded-xl ${action.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                       <action.icon className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="ml-3 text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="ml-4 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {action.title}
                     </h3>
                   </div>
@@ -294,10 +359,10 @@ const AdminDashboard = () => {
         </div>
 
         {/* Activité récente */}
-        <Card>
+        <Card className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-0 shadow-lg">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <BarChart3 className="h-5 w-5 mr-2" />
+            <CardTitle className="flex items-center text-gray-900 dark:text-white">
+              <BarChart3 className="h-5 w-5 mr-2 text-blue-500" />
               Activité récente
             </CardTitle>
             <CardDescription>
@@ -306,25 +371,25 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Données migrées vers MongoDB</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Données migrées vers MongoDB</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     Il y a quelques minutes
                   </p>
                 </div>
-                <Badge variant="secondary">Système</Badge>
+                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Système</Badge>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Dashboard admin créé</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Dashboard admin amélioré</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     Il y a quelques minutes
                   </p>
                 </div>
-                <Badge variant="secondary">Développement</Badge>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">Développement</Badge>
               </div>
             </div>
           </CardContent>

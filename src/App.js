@@ -24,6 +24,13 @@ import AdminSkills from "./pages/admin/AdminSkills.jsx";
 import AdminPersonal from "./pages/admin/AdminPersonal.jsx";
 import AdminServices from "./pages/admin/AdminServices.jsx";
 import AdminTestimonials from "./pages/admin/AdminTestimonials.jsx";
+import AdminSettings from "./pages/admin/AdminSettings.jsx";
+import AdminTechnologies from "./pages/admin/AdminTechnologies.jsx";
+import AdminAnalytics from "./pages/admin/AdminAnalytics.jsx";
+import AdminSocialLinks from "./pages/admin/AdminSocialLinks.jsx";
+import AdminProcessSteps from "./pages/admin/AdminProcessSteps.jsx";
+import AdminResources from "./pages/admin/AdminResources.jsx";
+import AdminBlog from "./pages/admin/AdminBlog.jsx";
 
 function App() {
   return (
@@ -32,7 +39,7 @@ function App() {
         <LanguageProvider>
           <BrowserRouter>
             <Routes>
-              {/* Admin Routes */}
+              {/* Admin Routes - Also wrapped in ThemeProvider */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/projects" element={<AdminProjects />} />
@@ -40,6 +47,13 @@ function App() {
               <Route path="/admin/personal" element={<AdminPersonal />} />
               <Route path="/admin/services" element={<AdminServices />} />
               <Route path="/admin/testimonials" element={<AdminTestimonials />} />
+              <Route path="/admin/technologies" element={<AdminTechnologies />} />
+              <Route path="/admin/statistics" element={<AdminAnalytics />} />
+              <Route path="/admin/social-links" element={<AdminSocialLinks />} />
+              <Route path="/admin/process-steps" element={<AdminProcessSteps />} />
+              <Route path="/admin/resources" element={<AdminResources />} />
+              <Route path="/admin/blog" element={<AdminBlog />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
               
               {/* Public Routes */}
               <Route path="/*" element={

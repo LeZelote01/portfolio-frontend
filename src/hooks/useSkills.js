@@ -8,7 +8,31 @@ const useSkills = () => {
       items: [
         { name: "Audit de sécurité", level: 95 },
         { name: "Pentesting", level: 90 },
-        { name: "Forensique", level: 85 }
+        { name: "Forensique", level: 85 },
+        { name: "Conformité RGPD", level: 88 },
+        { name: "Sécurité des réseaux", level: 92 }
+      ]
+    },
+    python: {
+      title: "Développement Python",
+      icon: "code",
+      items: [
+        { name: "Django/FastAPI", level: 95 },
+        { name: "Automatisation", level: 92 },
+        { name: "Data Science", level: 85 },
+        { name: "APIs REST", level: 98 },
+        { name: "Tests unitaires", level: 90 }
+      ]
+    },
+    network: {
+      title: "Réseau & Infrastructure",
+      icon: "network",
+      items: [
+        { name: "Administration Linux", level: 90 },
+        { name: "Configuration réseau", level: 88 },
+        { name: "Firewalls", level: 85 },
+        { name: "Monitoring", level: 87 },
+        { name: "Virtualisation", level: 82 }
       ]
     }
   };
@@ -19,11 +43,21 @@ const useSkills = () => {
       title: "Cybersécurité",
       icon: "shield-check",
       category_key: "cybersecurity",
-      items: [
-        { name: "Audit de sécurité", level: 95 },
-        { name: "Pentesting", level: 90 },
-        { name: "Forensique", level: 85 }
-      ]
+      items: defaultSkills.cybersecurity.items
+    },
+    {
+      id: "2", 
+      title: "Développement Python",
+      icon: "code",
+      category_key: "python",
+      items: defaultSkills.python.items
+    },
+    {
+      id: "3",
+      title: "Réseau & Infrastructure", 
+      icon: "network",
+      category_key: "network",
+      items: defaultSkills.network.items
     }
   ];
 
@@ -39,7 +73,9 @@ const useSkills = () => {
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/public/skills`);
         
         if (!response.ok) {
-          throw new Error('Erreur lors du chargement des compétences');
+          console.warn('Failed to fetch skills from API, using default data');
+          setError(null);
+          return;
         }
         
         const data = await response.json();
@@ -57,11 +93,13 @@ const useSkills = () => {
             };
           });
           setSkills(skillsObj);
+          setError(null);
+        } else {
+          console.warn('No skills data received from API, using default data');
+          // Garder les données par défaut
         }
-        
-        setError(null);
       } catch (err) {
-        console.warn('Utilisation des données par défaut pour les compétences:', err.message);
+        console.warn('Error fetching skills, using default data:', err.message);
         setError(null); // Ne pas afficher d'erreur, utiliser les données par défaut
       } finally {
         setLoading(false);

@@ -20,7 +20,7 @@ const Header = () => {
     { name: t('about'), href: "/about" },
     { name: t('skills'), href: "/skills" },
     { name: t('projects'), href: "/projects" },
-    { name: "Outils", href: "/tools" },
+    { name: t('tools'), href: "/tools" },
     { name: t('services'), href: "/services" },
     { name: t('contact'), href: "/contact" }
   ];

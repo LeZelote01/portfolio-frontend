@@ -12,7 +12,7 @@ import useTestimonials from '../hooks/useTestimonials';
 import useStatistics from '../hooks/useStatistics';
 
 const Home = () => {
-  const { t } = useLanguage();
+  const { t, td } = useLanguage();
 
   // Use hooks for data
   const { personalInfo, loading: personalLoading } = usePersonalInfo();
@@ -23,7 +23,7 @@ const Home = () => {
 
   // Loading state for critical data
   if (personalLoading || skillsLoading || statsLoading) {
-    return <LoadingSpinner message="Chargement du portfolio..." />;
+    return <LoadingSpinner message={t('loadingPortfolio')} />;
   }
 
   return (
@@ -53,7 +53,7 @@ const Home = () => {
               </div>
               <div className="flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-2">
                 <Network size={16} className="text-green-400" />
-                <span className="text-sm text-gray-300">Réseaux</span>
+                <span className="text-sm text-gray-300">{td('Réseaux')}</span>
               </div>
             </div>
 
@@ -70,17 +70,15 @@ const Home = () => {
               </span>
             </h1>
 
-            {/* Subtitle from API */}
-            {personalInfo && (
-              <>
-                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                  {personalInfo.subtitle}
-                </p>
+            {/* Subtitle - Use static translations instead of API data */}
+            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              {t('heroDescription')}
+            </p>
 
-                <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                  {personalInfo.bio.substring(0, 200)}...
-                </p>
-              </>
+            {personalInfo && personalInfo.bio && (
+              <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                {personalInfo.bio.substring(0, 200)}...
+              </p>
             )}
 
             {/* CTA Buttons */}
@@ -104,10 +102,10 @@ const Home = () => {
               {statistics.map((stat, index) => (
                 <div key={index} className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">
-                    {stat.value}
+                    {stat.value}{stat.suffix}
                   </div>
                   <div className="text-sm text-gray-400">
-                    {stat.label}
+                    {td(stat.title)}
                   </div>
                 </div>
               ))}
@@ -122,10 +120,10 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-6">
-                Outils <span className="text-green-400">gratuits</span>
+                {t('freeTools')} <span className="text-green-400"></span>
               </h2>
               <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-                Utilisez gratuitement nos outils en ligne pour vos besoins en cybersécurité
+                {t('freeToolsDesc')}
               </p>
             </div>
 
@@ -139,14 +137,14 @@ const Home = () => {
                     <Calculator size={32} className="text-gray-900" />
                   </div>
                   <h3 className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
-                    Calculateur de Prix
+                    {t('priceCalculator')}
                   </h3>
                 </div>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Obtenez une estimation instantanée pour votre projet de cybersécurité
+                  {t('priceCalculatorDesc')}
                 </p>
                 <div className="flex items-center gap-2 text-green-400 group-hover:gap-3 transition-all">
-                  <span className="text-sm font-medium">Calculer maintenant</span>
+                  <span className="text-sm font-medium">{t('calculateNow')}</span>
                   <ArrowRight size={16} />
                 </div>
               </Link>
@@ -160,14 +158,14 @@ const Home = () => {
                     <FileText size={32} className="text-gray-900" />
                   </div>
                   <h3 className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
-                    Ressources Gratuites
+                    {t('freeResourcesHome')}
                   </h3>
                 </div>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Téléchargez gratuitement nos guides, scripts et templates
+                  {t('freeResourcesHomeDesc')}
                 </p>
                 <div className="flex items-center gap-2 text-green-400 group-hover:gap-3 transition-all">
-                  <span className="text-sm font-medium">Télécharger</span>
+                  <span className="text-sm font-medium">{t('downloadNow')}</span>
                   <ArrowRight size={16} />
                 </div>
               </Link>
@@ -181,14 +179,14 @@ const Home = () => {
                     <BookOpen size={32} className="text-gray-900" />
                   </div>
                   <h3 className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
-                    Blog Technique
+                    {t('technicalBlogHome')}
                   </h3>
                 </div>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Découvrez mes articles sur la cybersécurité et Python
+                  {t('technicalBlogHomeDesc')}
                 </p>
                 <div className="flex items-center gap-2 text-green-400 group-hover:gap-3 transition-all">
-                  <span className="text-sm font-medium">Lire les articles</span>
+                  <span className="text-sm font-medium">{t('readArticles')}</span>
                   <ArrowRight size={16} />
                 </div>
               </Link>
@@ -203,10 +201,10 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-6">
-                Aperçu de mes <span className="text-green-400">compétences</span>
+                {t('skillsOverview')} <span className="text-green-400"></span>
               </h2>
               <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-                Un aperçu de mes domaines d'expertise en cybersécurité et développement
+                {t('skillsOverviewDesc')}
               </p>
             </div>
 
@@ -224,14 +222,14 @@ const Home = () => {
                       </span>
                     </div>
                     <h3 className="text-2xl font-bold text-white group-hover:text-green-400 transition-colors">
-                      {skill.title}
+                      {td(skill.title)}
                     </h3>
                   </div>
                   
                   <div className="space-y-3">
                     {skill.items.slice(0, 3).map((item, itemIndex) => (
                       <div key={itemIndex} className="flex items-center justify-between">
-                        <span className="text-gray-300">{item.name}</span>
+                        <span className="text-gray-300">{td(item.name)}</span>
                         <span className="text-green-400 font-semibold">{item.level}%</span>
                       </div>
                     ))}
@@ -254,15 +252,15 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-6">
-                Projets <span className="text-green-400">en vedette</span>
+                {t('featuredProjects')} <span className="text-green-400"></span>
               </h2>
               <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-                Découvrez quelques-uns de mes projets les plus remarquables
+                {t('featuredProjectsDesc')}
               </p>
             </div>
 
             {projectsLoading ? (
-              <LoadingSpinner message="Chargement des projets..." />
+              <LoadingSpinner message={t('loadingProjects')} />
             ) : (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -311,7 +309,7 @@ const Home = () => {
                     to="/projects"
                     className="bg-gradient-to-r from-green-400 to-cyan-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:from-green-500 hover:to-cyan-500 transition-all duration-200 transform hover:scale-105 inline-flex items-center gap-2"
                   >
-                    Voir tous les projets
+                    {t('viewAllProjects')}
                     <ChevronRight size={20} />
                   </Link>
                 </div>
@@ -327,12 +325,12 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-6">
-                Ce que disent mes <span className="text-green-400">clients</span>
+                {t('whatClientsSay')} <span className="text-green-400"></span>
               </h2>
             </div>
 
             {testimonialsLoading ? (
-              <LoadingSpinner message="Chargement des témoignages..." />
+              <LoadingSpinner message={t('loadingTestimonials')} />
             ) : (
               <div className="grid md:grid-cols-3 gap-8">
                 {testimonials.map((testimonial, index) => (
